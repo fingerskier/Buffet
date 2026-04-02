@@ -37,7 +37,9 @@ const api = {
     exportAll: () => ipcRenderer.invoke('config:exportAll'),
     importAll: (json: string) => ipcRenderer.invoke('config:importAll', json),
     getFavorites: () => ipcRenderer.invoke('config:getFavorites'),
-    saveFavorites: (groups: any) => ipcRenderer.invoke('config:saveFavorites', groups)
+    saveFavorites: (groups: any) => ipcRenderer.invoke('config:saveFavorites', groups),
+    getFavoriteRecords: () => ipcRenderer.invoke('config:getFavoriteRecords'),
+    saveFavoriteRecords: (favs: any) => ipcRenderer.invoke('config:saveFavoriteRecords', favs)
   },
 
   on: (channel: string, callback: (...args: any[]) => void) => {

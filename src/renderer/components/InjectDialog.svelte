@@ -15,16 +15,22 @@
     }
   }
 
+  let dialogEl: HTMLDivElement
+
   function handleKeydown(e: KeyboardEvent) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       handleSubmit()
     }
   }
+
+  $effect(() => {
+    dialogEl?.querySelector<HTMLElement>('input, textarea, select')?.focus()
+  })
 </script>
 
 <div class="overlay" onclick={onClose} role="presentation">
-  <div class="dialog" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.key === 'Escape' && onClose()} role="dialog" tabindex="-1">
+  <div class="dialog" bind:this={dialogEl} onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.key === 'Escape' && onClose()} role="dialog" tabindex="-1">
     <h3>Inject into {unitName}</h3>
     <p class="hint">Send a command or text to PID {pid}</p>
 

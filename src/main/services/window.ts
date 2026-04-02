@@ -22,18 +22,19 @@ export class WindowService {
     const units = this.terminalService.list()
     const positions = await Promise.all(
       units.map(async (unit) => {
+        let rect: WindowRect = { x: 100, y: 100, width: 800, height: 600 }
         try {
-          const rect = await this.platform.getWindowRect(unit.pid)
-          return { unitName: unit.name, shell: unit.shell, rect }
+          rect = await this.platform.getWindowRect(unit.pid)
         } catch {
-          return null
+          // Use default rect if window handle not found
         }
+        return { unitName: unit.name, shell: unit.shell, cwd: unit.cwd, rect }
       })
     )
 
     const layout: Layout = {
       name,
-      positions: positions.filter((p): p is NonNullable<typeof p> => p !== null),
+      positions,
       createdAt: Date.now()
     }
 
@@ -54,14 +55,25 @@ export class WindowService {
     const layout = layouts.find(l => l.name === name)
     if (!layout) throw new Error(`Layout "${name}" not found`)
 
-    const units = this.terminalService.list()
+    // Spawn missing units, reuse existing ones by name
     for (const pos of layout.positions) {
-      const unit = units.find(u => u.name === pos.unitName)
+      let unit = this.terminalService.list().find(u => u.name === pos.unitName)
+      if (!unit) {
+        unit = await this.terminalService.spawn(pos.shell, pos.unitName, pos.cwd)
+      }
+    }
+
+    // Brief delay to let windows appear before positioning
+    await new Promise(r => setTimeout(r, 800))
+
+    // Position all matched units
+    for (const pos of layout.positions) {
+      const unit = this.terminalService.list().find(u => u.name === pos.unitName)
       if (unit) {
         try {
           await this.platform.setWindowRect(unit.pid, pos.rect)
         } catch {
-          // Window may not exist anymore
+          // Window may not be ready yet
         }
       }
     }

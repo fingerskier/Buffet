@@ -27,14 +27,20 @@
     })
   })
 
+  let dialogEl: HTMLDivElement
+
   function handleSubmit() {
     onSpawn(shell, name || undefined as any, cwd || undefined as any)
     onClose()
   }
+
+  $effect(() => {
+    dialogEl?.querySelector<HTMLElement>('input, textarea, select')?.focus()
+  })
 </script>
 
 <div class="overlay" onclick={onClose} role="presentation">
-  <div class="dialog" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.key === 'Escape' && onClose()} role="dialog" tabindex="-1">
+  <div class="dialog" bind:this={dialogEl} onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.key === 'Escape' && onClose()} role="dialog" tabindex="-1">
     <h3>Spawn Terminal</h3>
 
     <label class="field">

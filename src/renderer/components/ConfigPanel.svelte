@@ -38,13 +38,16 @@
     { label: '60 seconds', value: 60000 }
   ]
 
+  let panelEl: HTMLDivElement
+
   $effect(() => {
     refreshConfig()
+    panelEl?.querySelector<HTMLElement>('input, textarea, select')?.focus()
   })
 </script>
 
 <div class="overlay" onclick={onClose} role="presentation">
-  <div class="panel" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.key === 'Escape' && onClose()} role="dialog" tabindex="-1">
+  <div class="panel" bind:this={panelEl} onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.key === 'Escape' && onClose()} role="dialog" tabindex="-1">
     <h3>⚙ Configuration</h3>
 
     <label class="field">

@@ -32,9 +32,17 @@ export interface Layout {
   positions: Array<{
     unitName: string
     shell: ShellType
+    cwd: string
     rect: WindowRect
   }>
   createdAt: number
+}
+
+export interface Favorite {
+  id: string
+  name: string
+  shell: ShellType
+  cwd: string
 }
 
 export interface FavoriteGroup {

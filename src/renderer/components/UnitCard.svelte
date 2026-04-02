@@ -1,8 +1,9 @@
 <script lang="ts">
   import type { Unit } from '../../shared/types'
 
-  let { unit, onInject, onFocus, onKill, onAnalyze, onToggleFavorite }: {
+  let { unit, isFavorite, onInject, onFocus, onKill, onAnalyze, onToggleFavorite }: {
     unit: Unit
+    isFavorite: boolean
     onInject: (pid: number) => void
     onFocus: (pid: number) => void
     onKill: (pid: number) => void
@@ -32,8 +33,8 @@
       <span class="card-meta">{unit.shell} · PID {unit.pid}</span>
     </div>
     <div class="card-badges">
-      <button class="star-btn" class:active={unit.isFavorite} onclick={() => onToggleFavorite(unit.pid)}>
-        {unit.isFavorite ? '⭐' : '☆'}
+      <button class="star-btn" class:active={isFavorite} onclick={() => onToggleFavorite(unit.pid)}>
+        {isFavorite ? '★' : '☆'}
       </button>
       <span class="status-badge" style="background: {stateColors[unit.status.state]}; color: {unit.status.state === 'waiting' ? '#1a1a2e' : 'white'}">
         {stateLabels[unit.status.state]}
@@ -112,19 +113,22 @@
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 18px;
     padding: 2px 4px;
-    opacity: 0.4;
-    transition: opacity 0.15s, transform 0.15s;
+    color: var(--text-muted);
+    opacity: 0.7;
+    transition: opacity 0.15s, transform 0.15s, color 0.15s;
   }
 
   .star-btn:hover {
-    opacity: 0.8;
+    opacity: 1;
+    color: var(--warning);
     transform: scale(1.2);
   }
 
   .star-btn.active {
     opacity: 1;
+    color: var(--warning);
   }
 
   .star-btn.active:hover {

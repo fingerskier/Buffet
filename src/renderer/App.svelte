@@ -7,7 +7,8 @@
   import ConfigPanel from './components/ConfigPanel.svelte'
   import FavoritesPanel from './components/FavoritesPanel.svelte'
   import { refreshUnits, setupUnitListeners, units } from './stores/units'
-  import type { ShellType, Unit } from '../shared/types'
+  import { favoriteRecords, refreshFavoriteRecords } from './stores/config'
+  import type { Favorite, ShellType, Unit } from '../shared/types'
 
   let showSpawn = $state(false)
   let showLayouts = $state(false)
@@ -15,10 +16,14 @@
   let showFavorites = $state(false)
   let injectTarget = $state<{ pid: number; name: string } | null>(null)
 
+  let favs = $state<Favorite[]>([])
+  favoriteRecords.subscribe(v => favs = v)
+
   const api = (window as any).api
 
   $effect(() => {
     refreshUnits()
+    refreshFavoriteRecords()
     const cleanup = setupUnitListeners()
     return cleanup
   })
@@ -58,8 +63,43 @@
   }
 
   async function handleToggleFavorite(pid: number) {
-    await api.terminal.toggleFavorite(pid)
+    let unitList: Unit[] = []
+    units.subscribe(v => unitList = v)()
+    const unit = unitList.find(u => u.pid === pid)
+    if (!unit) return
+
+    const currentFavs = [...favs]
+    const existing = currentFavs.find(
+      f => f.name === unit.name && f.shell === unit.shell && f.cwd === unit.cwd
+    )
+
+    if (existing) {
+      await api.config.saveFavoriteRecords(currentFavs.filter(f => f.id !== existing.id))
+    } else {
+      const fav: Favorite = {
+        id: crypto.randomUUID(),
+        name: unit.name,
+        shell: unit.shell,
+        cwd: unit.cwd
+      }
+      await api.config.saveFavoriteRecords([...currentFavs, fav])
+    }
+    await refreshFavoriteRecords()
+  }
+
+  async function handleSpawnFavorite(fav: Favorite) {
+    try {
+      await api.terminal.spawn(fav.shell, fav.name, fav.cwd)
+    } catch (e) {
+      console.error('Spawn from favorite failed:', e)
+    }
     await refreshUnits()
+  }
+
+  async function handleDeleteFavorite(id: string) {
+    const currentFavs = [...favs]
+    await api.config.saveFavoriteRecords(currentFavs.filter(f => f.id !== id))
+    await refreshFavoriteRecords()
   }
 </script>
 
@@ -76,6 +116,9 @@
     onKill={handleKill}
     onAnalyze={handleAnalyze}
     onToggleFavorite={handleToggleFavorite}
+    onSpawnFavorite={handleSpawnFavorite}
+    onDeleteFavorite={handleDeleteFavorite}
+    favorites={favs}
   />
 
   {#if showSpawn}

@@ -52,6 +52,8 @@ export function registerIpcHandlers(services: Services): void {
   ipcMain.handle('config:save', (_e, cfg) => config.save(cfg))
   ipcMain.handle('config:getFavorites', () => config.getFavorites())
   ipcMain.handle('config:saveFavorites', (_e, groups) => config.saveFavorites(groups))
+  ipcMain.handle('config:getFavoriteRecords', () => config.getFavoriteRecords())
+  ipcMain.handle('config:saveFavoriteRecords', (_e, favs) => config.saveFavoriteRecords(favs))
 
   ipcMain.handle('config:exportAll', async () => {
     const json = config.exportAll()

@@ -1,7 +1,7 @@
 import { app } from 'electron'
 import { join } from 'path'
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs'
-import type { AppConfig, FavoriteGroup, Layout } from '../../shared/types'
+import type { AppConfig, Favorite, FavoriteGroup, Layout } from '../../shared/types'
 
 const DATA_DIR = join(app.getPath('userData'), 'buffet-data')
 
@@ -47,6 +47,14 @@ export class ConfigService {
 
   saveFavorites(groups: FavoriteGroup[]): void {
     writeJson('favorites.json', groups)
+  }
+
+  getFavoriteRecords(): Favorite[] {
+    return readJson('favorite-records.json', [])
+  }
+
+  saveFavoriteRecords(favs: Favorite[]): void {
+    writeJson('favorite-records.json', favs)
   }
 
   getLayouts(): Layout[] {

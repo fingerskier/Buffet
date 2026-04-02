@@ -1,5 +1,6 @@
 <script lang="ts">
   import { layouts, refreshLayouts } from '../stores/layouts'
+  import { refreshUnits } from '../stores/units'
 
   let { onClose }: { onClose: () => void } = $props()
 
@@ -19,6 +20,7 @@
 
   async function restoreLayout(name: string) {
     await api.window.restoreLayout(name)
+    await refreshUnits()
   }
 
   async function deleteLayout(name: string) {
@@ -26,13 +28,16 @@
     await refreshLayouts()
   }
 
+  let panelEl: HTMLDivElement
+
   $effect(() => {
     refreshLayouts()
+    panelEl?.querySelector<HTMLElement>('input, textarea, select')?.focus()
   })
 </script>
 
 <div class="overlay" onclick={onClose} role="presentation">
-  <div class="panel" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.key === 'Escape' && onClose()} role="dialog" tabindex="-1">
+  <div class="panel" bind:this={panelEl} onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.key === 'Escape' && onClose()} role="dialog" tabindex="-1">
     <h3>📐 Layouts</h3>
 
     <div class="save-row">
