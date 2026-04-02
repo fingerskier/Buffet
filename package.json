@@ -1,0 +1,26 @@
+{
+  "name": "buffet",
+  "version": "0.1.0",
+  "description": "A terminal wrangling dashboard",
+  "type": "module",
+  "main": "./out/main/index.js",
+  "author": "Matt Currier",
+  "license": "MIT",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "package": "electron-builder"
+  },
+  "dependencies": {
+    "electron-store": "^8.2.0"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^5.0.3",
+    "electron": "^35.1.2",
+    "electron-builder": "^25.1.8",
+    "electron-vite": "^3.1.0",
+    "svelte": "^5.30.2",
+    "typescript": "^5.8.3"
+  }
+}

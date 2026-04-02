@@ -1,0 +1,20 @@
+appId: com.buffet.app
+productName: Buffet
+directories:
+  buildResources: build
+  output: dist
+files:
+  - out/**/*
+mac:
+  category: public.app-category.developer-tools
+  target:
+    - dmg
+    - zip
+win:
+  target:
+    - nsis
+linux:
+  target:
+    - AppImage
+    - deb
+  category: Development
