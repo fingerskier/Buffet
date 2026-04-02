@@ -112,13 +112,23 @@
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 12px;
-    padding: 2px;
-    opacity: 0.5;
+    font-size: 16px;
+    padding: 2px 4px;
+    opacity: 0.4;
+    transition: opacity 0.15s, transform 0.15s;
+  }
+
+  .star-btn:hover {
+    opacity: 0.8;
+    transform: scale(1.2);
   }
 
   .star-btn.active {
     opacity: 1;
+  }
+
+  .star-btn.active:hover {
+    transform: scale(1.2);
   }
 
   .status-badge {

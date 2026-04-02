@@ -24,7 +24,11 @@
   })
 
   async function handleSpawn(shell: ShellType, name: string, cwd: string) {
-    await api.terminal.spawn(shell, name, cwd)
+    try {
+      await api.terminal.spawn(shell, name, cwd)
+    } catch (e) {
+      console.error('Spawn failed:', e)
+    }
     await refreshUnits()
   }
 
