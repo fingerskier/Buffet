@@ -42,7 +42,42 @@ export class ConfigService {
   }
 
   getFavorites(): FavoriteGroup[] {
-    return readJson('favorites.json', [])
+    const raw = readJson<any[]>('favorites.json', [])
+    const favs = this.getFavoriteRecords()
+    let migrated = false
+
+    const groups: FavoriteGroup[] = raw.map((g: any) => {
+      // Already new format
+      if (Array.isArray(g.favoriteIds)) {
+        return { id: g.id, name: g.name, favoriteIds: g.favoriteIds }
+      }
+      // Old format: convert units[] to favoriteIds[]
+      migrated = true
+      const ids = (g.units || [])
+        .map((u: any) => {
+          const match = favs.find(
+            f => f.name === u.name && f.shell === u.shell && f.cwd === u.cwd
+          )
+          return match?.id
+        })
+        .filter(Boolean) as string[]
+      return { id: crypto.randomUUID(), name: g.name, favoriteIds: ids }
+    })
+
+    // Clean dangling references
+    const validIds = new Set(favs.map(f => f.id))
+    let cleaned = false
+    for (const group of groups) {
+      const before = group.favoriteIds.length
+      group.favoriteIds = group.favoriteIds.filter(id => validIds.has(id))
+      if (group.favoriteIds.length !== before) cleaned = true
+    }
+
+    if (migrated || cleaned) {
+      this.saveFavorites(groups)
+    }
+
+    return groups
   }
 
   saveFavorites(groups: FavoriteGroup[]): void {
@@ -69,6 +104,7 @@ export class ConfigService {
     return JSON.stringify({
       config: this.load(),
       favorites: this.getFavorites(),
+      favoriteRecords: this.getFavoriteRecords(),
       layouts: this.getLayouts()
     }, null, 2)
   }
@@ -77,6 +113,7 @@ export class ConfigService {
     const data = JSON.parse(json)
     if (data.config) this.save(data.config)
     if (data.favorites) this.saveFavorites(data.favorites)
+    if (data.favoriteRecords) this.saveFavoriteRecords(data.favoriteRecords)
     if (data.layouts) this.saveLayouts(data.layouts)
   }
 }
