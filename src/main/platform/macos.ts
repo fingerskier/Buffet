@@ -22,6 +22,13 @@ const SHELL_COMMANDS: Record<ShellType, string> = {
 }
 
 export class MacOSAdapter implements PlatformAdapter {
+  private pidWindowIdMap = new Map<number, number>()
+
+  private windowRef(pid: number): string {
+    const wid = this.pidWindowIdMap.get(pid)
+    return wid ? `window id ${wid}` : 'front window'
+  }
+
   async spawnTerminal(shell: ShellType, cwd?: string, name?: string): Promise<number> {
     const shellCmd = SHELL_COMMANDS[shell]
     if (!shellCmd) {
@@ -32,7 +39,16 @@ export class MacOSAdapter implements PlatformAdapter {
     const script = `${cdPrefix}${shellCmd}`
     const title = name || shell
 
-    const { stdout } = await osascript(
+    // Snapshot existing PIDs before spawning
+    let beforePids = new Set<number>()
+    try {
+      const { stdout: pgrepOut } = await exec('pgrep', [shell])
+      beforePids = new Set(pgrepOut.trim().split(/\s+/).filter(Boolean).map(Number))
+    } catch {
+      // pgrep returns exit code 1 when no processes found
+    }
+
+    const { stdout: windowIdOut } = await osascript(
       'tell application "Terminal"',
       '  activate',
       `  set newTab to do script "${script.replace(/"/g, '\\"')}"`,
@@ -40,47 +56,52 @@ export class MacOSAdapter implements PlatformAdapter {
       '  return id of window 1',
       'end tell'
     )
+    const windowId = parseInt(windowIdOut.trim(), 10)
 
-    // Get the PID of the shell process in the new tab
-    const { stdout: pidOut } = await osascript(
-      'tell application "Terminal"',
-      '  set procs to processes of window 1',
-      '  return item 1 of procs',
-      'end tell'
-    )
-
-    // Fallback: use lsof to find the newest shell process
-    try {
-      const { stdout: lsofOut } = await exec('pgrep', ['-n', shell])
-      return parseInt(lsofOut.trim(), 10)
-    } catch {
-      // If pgrep fails, return a placeholder from the window ID
-      return parseInt(stdout.trim(), 10) || Date.now()
+    // Poll for a new shell PID that wasn't in the before-snapshot (up to 3s)
+    for (let i = 0; i < 6; i++) {
+      await new Promise((r) => setTimeout(r, 500))
+      try {
+        const { stdout: pgrepOut } = await exec('pgrep', [shell])
+        const currentPids = pgrepOut.trim().split(/\s+/).filter(Boolean).map(Number)
+        const newPid = currentPids.find((p) => !beforePids.has(p))
+        if (newPid) {
+          if (!isNaN(windowId)) this.pidWindowIdMap.set(newPid, windowId)
+          return newPid
+        }
+      } catch {
+        // No processes yet, keep polling
+      }
     }
+    throw new Error(`Timed out waiting for ${shell} process to start`)
   }
 
   async injectText(pid: number, text: string): Promise<void> {
     const escaped = text.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+    const winRef = this.windowRef(pid)
     await osascript(
       'tell application "Terminal"',
       '  activate',
-      `  do script "${escaped}" in front window`,
+      `  do script "${escaped}" in ${winRef}`,
       'end tell'
     )
   }
 
-  async focusWindow(_pid: number): Promise<void> {
+  async focusWindow(pid: number): Promise<void> {
+    const winRef = this.windowRef(pid)
     await osascript(
       'tell application "Terminal"',
+      `  set index of ${winRef} to 1`,
       '  activate',
       'end tell'
     )
   }
 
-  async getWindowRect(_pid: number): Promise<WindowRect> {
+  async getWindowRect(pid: number): Promise<WindowRect> {
+    const winRef = this.windowRef(pid)
     const { stdout } = await osascript(
       'tell application "Terminal"',
-      '  set b to bounds of front window',
+      `  set b to bounds of ${winRef}`,
       '  return (item 1 of b) & "," & (item 2 of b) & "," & (item 3 of b) & "," & (item 4 of b)',
       'end tell'
     )
@@ -88,20 +109,22 @@ export class MacOSAdapter implements PlatformAdapter {
     return { x, y, width: x2 - x, height: y2 - y }
   }
 
-  async setWindowRect(_pid: number, rect: WindowRect): Promise<void> {
+  async setWindowRect(pid: number, rect: WindowRect): Promise<void> {
     const { x, y, width, height } = rect
+    const winRef = this.windowRef(pid)
     await osascript(
       'tell application "Terminal"',
-      `  set bounds of front window to {${x}, ${y}, ${x + width}, ${y + height}}`,
+      `  set bounds of ${winRef} to {${x}, ${y}, ${x + width}, ${y + height}}`,
       'end tell'
     )
   }
 
-  async captureScreenContent(_pid: number): Promise<string> {
+  async captureScreenContent(pid: number): Promise<string> {
+    const winRef = this.windowRef(pid)
     try {
       const { stdout } = await osascript(
         'tell application "Terminal"',
-        '  set windowContent to contents of front window',
+        `  set windowContent to contents of ${winRef}`,
         '  return windowContent',
         'end tell'
       )
@@ -117,6 +140,7 @@ export class MacOSAdapter implements PlatformAdapter {
     } catch {
       try { process.kill(pid, 'SIGKILL') } catch { /* already dead */ }
     }
+    this.pidWindowIdMap.delete(pid)
   }
 
   isProcessAlive(pid: number): boolean {

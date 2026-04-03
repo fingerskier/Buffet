@@ -31,6 +31,7 @@ export class TerminalService {
       createdAt: Date.now()
     }
     this.units.set(pid, unit)
+    this.onUnitsChanged?.()
     return unit
   }
 
