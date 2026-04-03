@@ -46,12 +46,15 @@ export interface Favorite {
 }
 
 export interface FavoriteGroup {
+  id: string
   name: string
-  units: Array<{
-    name: string
-    shell: ShellType
-    cwd: string
-  }>
+  favoriteIds: string[]
+}
+
+export interface Prompt {
+  id: string
+  name: string
+  text: string
 }
 
 export interface AppConfig {

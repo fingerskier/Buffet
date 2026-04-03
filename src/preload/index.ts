@@ -3,6 +3,10 @@ import { contextBridge, ipcRenderer } from 'electron'
 const api = {
   ping: () => ipcRenderer.invoke('app:ping'),
 
+  dialog: {
+    openDirectory: () => ipcRenderer.invoke('dialog:openDirectory')
+  },
+
   terminal: {
     spawn: (shell: string, name?: string, cwd?: string) =>
       ipcRenderer.invoke('terminal:spawn', shell, name, cwd),
@@ -11,6 +15,7 @@ const api = {
       ipcRenderer.invoke('terminal:inject', pid, text),
     kill: (pid: number) => ipcRenderer.invoke('terminal:kill', pid),
     focus: (pid: number) => ipcRenderer.invoke('terminal:focus', pid),
+    rename: (pid: number, name: string) => ipcRenderer.invoke('terminal:rename', pid, name),
     toggleFavorite: (pid: number) => ipcRenderer.invoke('terminal:toggleFavorite', pid)
   },
 
@@ -39,7 +44,9 @@ const api = {
     getFavorites: () => ipcRenderer.invoke('config:getFavorites'),
     saveFavorites: (groups: any) => ipcRenderer.invoke('config:saveFavorites', groups),
     getFavoriteRecords: () => ipcRenderer.invoke('config:getFavoriteRecords'),
-    saveFavoriteRecords: (favs: any) => ipcRenderer.invoke('config:saveFavoriteRecords', favs)
+    saveFavoriteRecords: (favs: any) => ipcRenderer.invoke('config:saveFavoriteRecords', favs),
+    getPrompts: () => ipcRenderer.invoke('config:getPrompts'),
+    savePrompts: (prompts: any) => ipcRenderer.invoke('config:savePrompts', prompts)
   },
 
   on: (channel: string, callback: (...args: any[]) => void) => {

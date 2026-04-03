@@ -1,12 +1,13 @@
 import type { ShellType, WindowRect } from '../../shared/types'
 
 export interface PlatformAdapter {
-  spawnTerminal(shell: ShellType, cwd?: string): Promise<number>
+  spawnTerminal(shell: ShellType, cwd?: string, name?: string): Promise<number>
   injectText(pid: number, text: string): Promise<void>
   focusWindow(pid: number): Promise<void>
   getWindowRect(pid: number): Promise<WindowRect>
   setWindowRect(pid: number, rect: WindowRect): Promise<void>
   captureScreenContent(pid: number): Promise<string>
+  killProcess(pid: number): Promise<void>
   isProcessAlive(pid: number): boolean
   getResourceUsage(pid: number): Promise<{ cpu: number; memory: number }>
 }

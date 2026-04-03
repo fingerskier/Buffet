@@ -2,7 +2,7 @@ import type { ShellType, WindowRect } from '../../shared/types'
 import type { PlatformAdapter } from './index'
 
 export class LinuxAdapter implements PlatformAdapter {
-  async spawnTerminal(_shell: ShellType, _cwd?: string): Promise<number> {
+  async spawnTerminal(_shell: ShellType, _cwd?: string, _name?: string): Promise<number> {
     throw new Error('Linux support not yet implemented')
   }
 
@@ -24,6 +24,12 @@ export class LinuxAdapter implements PlatformAdapter {
 
   async captureScreenContent(_pid: number): Promise<string> {
     throw new Error('Linux support not yet implemented')
+  }
+
+  async killProcess(pid: number): Promise<void> {
+    try { process.kill(-pid, 'SIGTERM') } catch {
+      try { process.kill(pid, 'SIGKILL') } catch { /* already dead */ }
+    }
   }
 
   isProcessAlive(_pid: number): boolean {

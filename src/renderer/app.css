@@ -1,18 +1,56 @@
+/* --- Inter Variable Font (Latin) --- */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/Inter.woff2') format('woff2');
+}
+
 :root {
-  --bg-primary: #1a1a2e;
-  --bg-secondary: #16213e;
-  --bg-card: #1e2a45;
-  --bg-action: #0f3460;
-  --border: #2a3a5c;
-  --accent: #e94560;
-  --info: #4cc9f0;
-  --success: #00b894;
-  --warning: #ffd700;
-  --danger: #e94560;
-  --idle: #636e72;
-  --text-primary: #e0e0e0;
-  --text-secondary: #aaaaaa;
-  --text-muted: #666666;
+  /* --- Surfaces --- */
+  --bg-primary: #0d0d0d;
+  --bg-secondary: #161616;
+  --bg-card: #1c1c1c;
+  --bg-action: #252525;
+  --bg-elevated: #2a2a2a;
+
+  /* --- Borders --- */
+  --border: #333333;
+  --border-subtle: #2a2a2a;
+  --border-focus: #b8a080;
+
+  /* --- Accent --- */
+  --accent: #c9a96e;
+  --accent-hover: #d4b87e;
+  --accent-muted: #8a7550;
+
+  /* --- Semantic --- */
+  --success: #5cb88a;
+  --warning: #d4a843;
+  --danger: #c75050;
+  --info: #8ab4c7;
+  --idle: #6b6b6b;
+
+  /* --- Text --- */
+  --text-primary: #e8e4df;
+  --text-secondary: #a09a92;
+  --text-muted: #6b6560;
+
+  /* --- Typography Scale --- */
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 15px;
+  --text-lg: 17px;
+  --text-xl: 20px;
+  --text-2xl: 28px;
+
+  /* --- Spacing --- */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
 }
 
 * {
@@ -22,7 +60,11 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: var(--text-base);
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
   background: var(--bg-primary);
   color: var(--text-primary);
   overflow: hidden;
@@ -41,7 +83,7 @@ main {
   align-items: center;
   justify-content: center;
   height: 100%;
-  gap: 24px;
+  gap: var(--space-lg);
 }
 
 .header {
@@ -56,14 +98,43 @@ main {
 
 .subtitle {
   color: var(--text-muted);
-  font-size: 14px;
+  font-size: var(--text-base);
 }
 
 .status-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 16px 24px;
-  font-size: 14px;
+  padding: var(--space-md) var(--space-lg);
+  font-size: var(--text-base);
   color: var(--info);
+}
+
+/* --- Custom Scrollbar --- */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #444444;
+}
+
+/* --- Focus Visible --- */
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* --- Global Interactive Transitions --- */
+button, input, select, textarea {
+  transition: background 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s;
 }

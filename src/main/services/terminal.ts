@@ -14,14 +14,16 @@ const EMPTY_STATUS: UnitStatus = {
 export class TerminalService {
   private units = new Map<number, Unit>()
   private livenessInterval: ReturnType<typeof setInterval> | null = null
+  onUnitsChanged: (() => void) | null = null
 
   constructor(private platform: PlatformAdapter) {}
 
   async spawn(shell: ShellType, name?: string, cwd?: string): Promise<Unit> {
-    const pid = await this.platform.spawnTerminal(shell, cwd)
+    const unitName = name || `${shell}-${Date.now()}`
+    const pid = await this.platform.spawnTerminal(shell, cwd, unitName)
     const unit: Unit = {
       pid,
-      name: name || `${shell}-${pid}`,
+      name: unitName,
       shell,
       cwd: cwd || process.cwd(),
       status: { ...EMPTY_STATUS, lastUpdated: Date.now() },
@@ -48,11 +50,12 @@ export class TerminalService {
   async kill(pid: number): Promise<void> {
     if (!this.units.has(pid)) throw new Error(`Unit ${pid} not found`)
     try {
-      process.kill(pid, 'SIGTERM')
+      await this.platform.killProcess(pid)
     } catch {
       // Process may already be dead
     }
     this.units.delete(pid)
+    this.onUnitsChanged?.()
   }
 
   async focus(pid: number): Promise<void> {
@@ -66,6 +69,13 @@ export class TerminalService {
     }
   }
 
+  rename(pid: number, name: string): void {
+    const unit = this.units.get(pid)
+    if (!unit) throw new Error(`Unit ${pid} not found`)
+    unit.name = name
+    this.onUnitsChanged?.()
+  }
+
   toggleFavorite(pid: number): boolean {
     const unit = this.units.get(pid)
     if (!unit) throw new Error(`Unit ${pid} not found`)
@@ -73,12 +83,17 @@ export class TerminalService {
     return unit.isFavorite
   }
 
-  startLivenessCheck(intervalMs = 5000): void {
+  startLivenessCheck(intervalMs = 2000): void {
     this.livenessInterval = setInterval(() => {
-      for (const [pid, unit] of this.units) {
+      let changed = false
+      for (const [pid] of this.units) {
         if (!this.platform.isProcessAlive(pid)) {
           this.units.delete(pid)
+          changed = true
         }
+      }
+      if (changed) {
+        this.onUnitsChanged?.()
       }
     }, intervalMs)
   }

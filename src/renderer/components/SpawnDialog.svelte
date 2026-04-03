@@ -28,10 +28,16 @@
   })
 
   let dialogEl: HTMLDivElement
+  const api = (window as any).api
 
   function handleSubmit() {
     onSpawn(shell, name || undefined as any, cwd || undefined as any)
     onClose()
+  }
+
+  async function pickDirectory() {
+    const dir = await api.dialog.openDirectory()
+    if (dir) cwd = dir
   }
 
   $effect(() => {
@@ -63,10 +69,13 @@
       <input type="text" bind:value={name} placeholder="e.g., api-server" />
     </label>
 
-    <label class="field">
+    <div class="field">
       <span>Working Directory (optional)</span>
-      <input type="text" bind:value={cwd} placeholder="e.g., ~/projects/myapp" />
-    </label>
+      <div class="dir-picker">
+        <input type="text" bind:value={cwd} placeholder="e.g., ~/projects/myapp" />
+        <button class="browse-btn" onclick={pickDirectory}>Browse</button>
+      </div>
+    </div>
 
     <div class="actions">
       <button class="cancel-btn" onclick={onClose}>Cancel</button>
@@ -79,7 +88,7 @@
   .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -90,26 +99,27 @@
     background: var(--bg-secondary);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 24px;
-    width: 400px;
+    padding: var(--space-lg);
+    width: 480px;
     max-width: 90vw;
   }
 
   h3 {
-    margin-bottom: 16px;
+    margin-bottom: var(--space-md);
     color: var(--text-primary);
+    font-size: var(--text-lg);
   }
 
   .field {
     display: block;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
   }
 
   .field span {
     display: block;
-    font-size: 12px;
+    font-size: var(--text-sm);
     color: var(--text-secondary);
-    margin-bottom: 4px;
+    margin-bottom: 6px;
   }
 
   .field input {
@@ -117,19 +127,44 @@
     background: var(--bg-primary);
     border: 1px solid var(--border);
     border-radius: 6px;
-    padding: 8px 12px;
+    padding: 10px 14px;
     color: var(--text-primary);
-    font-size: 13px;
+    font-size: var(--text-base);
     outline: none;
   }
 
   .field input:focus {
-    border-color: var(--info);
+    border-color: var(--border-focus);
+  }
+
+  .dir-picker {
+    display: flex;
+    gap: var(--space-sm);
+  }
+
+  .dir-picker input {
+    flex: 1;
+  }
+
+  .browse-btn {
+    background: var(--bg-action);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 16px;
+    color: var(--text-secondary);
+    font-size: var(--text-base);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .browse-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
   }
 
   .shell-options {
     display: flex;
-    gap: 8px;
+    gap: var(--space-sm);
   }
 
   .shell-btn {
@@ -137,40 +172,51 @@
     background: var(--bg-primary);
     border: 1px solid var(--border);
     border-radius: 6px;
-    padding: 8px;
+    padding: 10px 16px;
     color: var(--text-secondary);
-    font-size: 13px;
+    font-size: var(--text-base);
     cursor: pointer;
   }
 
   .shell-btn.active {
-    border-color: var(--info);
-    color: var(--info);
+    border-color: var(--accent);
+    color: var(--accent);
     background: var(--bg-action);
   }
 
   .actions {
     display: flex;
-    gap: 8px;
+    gap: var(--space-sm);
     justify-content: flex-end;
-    margin-top: 20px;
+    margin-top: var(--space-lg);
   }
 
   .cancel-btn {
     background: transparent;
     border: 1px solid var(--border);
     border-radius: 6px;
-    padding: 6px 16px;
+    padding: 8px 20px;
     color: var(--text-secondary);
+    font-size: var(--text-base);
     cursor: pointer;
+  }
+
+  .cancel-btn:hover {
+    border-color: var(--text-secondary);
   }
 
   .spawn-btn {
     background: var(--accent);
     border: none;
     border-radius: 6px;
-    padding: 6px 16px;
-    color: white;
+    padding: 8px 20px;
+    color: var(--bg-primary);
+    font-size: var(--text-base);
+    font-weight: 600;
     cursor: pointer;
+  }
+
+  .spawn-btn:hover {
+    background: var(--accent-hover);
   }
 </style>

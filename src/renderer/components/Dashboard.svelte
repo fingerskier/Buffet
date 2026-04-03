@@ -9,7 +9,7 @@
     onRenameFavorite, onSpawnFavorite, onDeleteFavorite,
     favorites, groups,
     onCreateGroup, onRenameGroup, onDeleteGroup,
-    onToggleGroupMembership, onRemoveFromGroup, onLaunchGroup
+    onToggleGroupMembership, onRemoveFromGroup, onLaunchGroup, onDropFavorite
   }: {
     onInject: (pid: number) => void
     onFocus: (pid: number) => void
@@ -28,6 +28,7 @@
     onToggleGroupMembership: (groupId: string, favoriteId: string) => void
     onRemoveFromGroup: (groupId: string, favoriteId: string) => void
     onLaunchGroup: (groupId: string) => void
+    onDropFavorite: (favoriteId: string, sourceGroupId: string | null, targetGroupId: string | null, copy: boolean) => void
   } = $props()
 
   let unitList = $state<Unit[]>([])
@@ -41,6 +42,28 @@
   let editingGroupId = $state<string | null>(null)
   let editGroupName = $state('')
   let menuGroupId = $state<string | null>(null)
+  let dragOverTarget = $state<string | null>(null)
+
+  function handleDragOver(e: DragEvent, targetKey: string) {
+    if (!e.dataTransfer?.types.includes('application/x-buffet-fav')) return
+    e.preventDefault()
+    e.dataTransfer.dropEffect = e.ctrlKey ? 'copy' : 'move'
+    dragOverTarget = targetKey
+  }
+
+  function handleDragLeave() {
+    dragOverTarget = null
+  }
+
+  function handleDrop(e: DragEvent, targetGroupId: string | null) {
+    e.preventDefault()
+    dragOverTarget = null
+    const data = e.dataTransfer?.getData('application/x-buffet-fav')
+    if (!data) return
+    const { favoriteId, sourceGroupId } = JSON.parse(data)
+    if (sourceGroupId === targetGroupId) return
+    onDropFavorite(favoriteId, sourceGroupId, targetGroupId, e.ctrlKey)
+  }
 
   function isFavorite(unit: Unit): boolean {
     return favorites.some(f => f.name === unit.name && f.shell === unit.shell && f.cwd === unit.cwd)
@@ -126,7 +149,14 @@
 
       <!-- Ungrouped favorites -->
       {#if ungroupedFavorites().length > 0}
-        <div class="group-section">
+        <div
+          class="group-section"
+          class:drag-over={dragOverTarget === '__ungrouped__'}
+          ondragover={(e) => handleDragOver(e, '__ungrouped__')}
+          ondragleave={handleDragLeave}
+          ondrop={(e) => handleDrop(e, null)}
+          role="list"
+        >
           <div class="group-header">
             <span class="group-label">Ungrouped</span>
             <span class="group-count">{ungroupedFavorites().length} favorites</span>
@@ -149,7 +179,14 @@
 
       <!-- Named groups -->
       {#each groups as group (group.id)}
-        <div class="group-section">
+        <div
+          class="group-section"
+          class:drag-over={dragOverTarget === group.id}
+          ondragover={(e) => handleDragOver(e, group.id)}
+          ondragleave={handleDragLeave}
+          ondrop={(e) => handleDrop(e, group.id)}
+          role="list"
+        >
           <div class="group-header">
             <button class="collapse-btn" onclick={() => toggleCollapse(group.id)}>
               {collapsedGroups.has(group.id) ? '\u25B6' : '\u25BC'}
@@ -333,6 +370,15 @@
     margin-bottom: var(--space-lg);
     position: relative;
     z-index: 1;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    padding: 4px;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .group-section.drag-over {
+    border-color: var(--accent);
+    background: rgba(96, 165, 250, 0.05);
   }
 
   .group-header {

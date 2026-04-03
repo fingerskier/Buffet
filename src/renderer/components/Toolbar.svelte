@@ -2,9 +2,10 @@
   import { searchQuery, statusFilter, units } from '../stores/units'
   import { get } from 'svelte/store'
 
-  let { onSpawn, onToggleLayouts, onToggleConfig }: {
+  let { onSpawn, onToggleLayouts, onTogglePrompts, onToggleConfig }: {
     onSpawn: () => void
     onToggleLayouts: () => void
+    onTogglePrompts: () => void
     onToggleConfig: () => void
   } = $props()
 
@@ -16,7 +17,7 @@
     { key: 'working', label: 'Working' },
     { key: 'waiting', label: 'Waiting' },
     { key: 'idle', label: 'Idle' },
-    { key: 'favorites', label: '⭐ Favorites' }
+    { key: 'favorites', label: '★ Favorites' }
   ] as const
 
   function handleSearch() {
@@ -31,14 +32,14 @@
 
 <div class="titlebar">
   <div class="titlebar-left">
-    <span class="app-title">🍽 Buffet</span>
+    <span class="app-title">Buffet</span>
     <span class="unit-count">{get(units).length} units</span>
   </div>
   <div class="titlebar-right">
     <input
       class="search-input"
       type="text"
-      placeholder="🔍 Search units..."
+      placeholder="Search units..."
       bind:value={search}
       oninput={handleSearch}
     />
@@ -58,14 +59,15 @@
     </button>
   {/each}
   <div class="spacer"></div>
-  <button class="toolbar-btn" onclick={onToggleLayouts}>📐 Layouts</button>
-  <button class="toolbar-btn" onclick={onToggleConfig}>⚙ Config</button>
+  <button class="toolbar-btn" onclick={onToggleLayouts}>Layouts</button>
+  <button class="toolbar-btn" onclick={onTogglePrompts}>Prompts</button>
+  <button class="toolbar-btn" onclick={onToggleConfig}>Config</button>
 </div>
 
 <style>
   .titlebar {
     background: var(--bg-secondary);
-    padding: 8px 16px;
+    padding: 10px var(--space-md);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -76,92 +78,102 @@
   .titlebar-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-sm);
   }
 
   .app-title {
-    font-size: 18px;
+    font-size: var(--text-xl);
     font-weight: 700;
     color: var(--accent);
+    letter-spacing: 0.02em;
   }
 
   .unit-count {
     color: var(--text-muted);
-    font-size: 12px;
+    font-size: var(--text-sm);
+    background: var(--bg-action);
+    padding: 2px 10px;
+    border-radius: 10px;
   }
 
   .titlebar-right {
     display: flex;
-    gap: 8px;
+    gap: var(--space-sm);
     -webkit-app-region: no-drag;
   }
 
   .search-input {
     background: var(--bg-action);
-    border: 1px solid #1a4080;
+    border: 1px solid var(--border);
     border-radius: 6px;
-    padding: 4px 12px;
-    font-size: 13px;
+    padding: 6px 14px;
+    font-size: var(--text-base);
     color: var(--text-secondary);
-    width: 200px;
+    width: 280px;
     outline: none;
   }
 
   .search-input:focus {
-    border-color: var(--info);
+    border-color: var(--border-focus);
   }
 
   .spawn-btn {
     background: var(--accent);
     border: none;
     border-radius: 6px;
-    padding: 4px 12px;
-    color: white;
-    font-size: 13px;
+    padding: 6px 16px;
+    color: var(--bg-primary);
+    font-size: var(--text-base);
+    font-weight: 600;
     cursor: pointer;
   }
 
   .spawn-btn:hover {
-    opacity: 0.9;
+    background: var(--accent-hover);
   }
 
   .toolbar {
     background: var(--bg-secondary);
-    padding: 6px 16px;
+    padding: 8px var(--space-md);
     display: flex;
-    gap: 8px;
+    gap: var(--space-sm);
     border-bottom: 1px solid var(--border);
     align-items: center;
   }
 
   .filter-label {
-    font-size: 11px;
+    font-size: var(--text-sm);
     color: var(--text-muted);
-    margin-right: 4px;
+    margin-right: var(--space-xs);
   }
 
   .filter-chip {
     background: transparent;
-    border: 1px solid #333;
-    border-radius: 12px;
-    padding: 2px 10px;
-    font-size: 11px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 6px 14px;
+    font-size: var(--text-sm);
     color: var(--text-muted);
     cursor: pointer;
   }
 
+  .filter-chip:hover {
+    border-color: var(--text-secondary);
+    color: var(--text-secondary);
+  }
+
   .filter-chip.active {
     background: var(--bg-action);
-    border-color: var(--info);
-    color: var(--info);
+    border-color: var(--accent);
+    color: var(--accent);
   }
 
   .toolbar-btn {
     background: transparent;
-    border: 1px solid #333;
-    border-radius: 12px;
-    padding: 2px 10px;
-    font-size: 11px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 6px 14px;
+    font-size: var(--text-sm);
     color: var(--text-muted);
     cursor: pointer;
   }

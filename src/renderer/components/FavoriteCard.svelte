@@ -51,9 +51,18 @@
     pickerAnchor = { x: rect.left, y: rect.bottom + 4 }
     showGroupPicker = true
   }
+
+  function handleDragStart(e: DragEvent) {
+    if (!e.dataTransfer) return
+    e.dataTransfer.setData('application/x-buffet-fav', JSON.stringify({
+      favoriteId: favorite.id,
+      sourceGroupId: groupId || null
+    }))
+    e.dataTransfer.effectAllowed = 'copyMove'
+  }
 </script>
 
-<div class="fav-card">
+<div class="fav-card" draggable="true" ondragstart={handleDragStart} role="listitem">
   <div class="card-header">
     <div class="card-info">
       {#if editing}

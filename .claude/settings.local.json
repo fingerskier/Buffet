@@ -3,7 +3,30 @@
     "allow": [
       "Bash(npm run:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(curl -sL -o \"C:/dev/fingerskier/agent/buffet/src/renderer/public/fonts/Inter-Regular.woff2\" \"https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfMZhrib2Bg-4.woff2\")",
+      "Bash(curl -sL -o \"C:/dev/fingerskier/agent/buffet/src/renderer/public/fonts/Inter-Medium.woff2\" \"https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuI6fMZhrib2Bg-4.woff2\")",
+      "Bash(curl -sL -o \"C:/dev/fingerskier/agent/buffet/src/renderer/public/fonts/Inter-SemiBold.woff2\" \"https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuGKYMZhrib2Bg-4.woff2\")",
+      "Bash(curl -sL -o \"C:/dev/fingerskier/agent/buffet/src/renderer/public/fonts/Inter-Bold.woff2\" \"https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuFuYMZhrib2Bg-4.woff2\")",
+      "Bash(curl -sL -H \"User-Agent: Mozilla/5.0\" \"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap\")",
+      "Bash(curl -sL -H \"User-Agent: Mozilla/5.0 \\(Windows NT 10.0; Win64; x64\\) AppleWebKit/537.36 \\(KHTML, like Gecko\\) Chrome/120.0.0.0 Safari/537.36\" \"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap\")",
+      "Read(//tmp/**)",
+      "Bash(curl -sL -o Inter-Regular.woff2 \"https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2\")",
+      "Bash(curl -sL -o Inter-Medium.woff2 \"https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2\")",
+      "Bash(curl -sL -o Inter-SemiBold.woff2 \"https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2\")",
+      "Bash(curl -sL -o Inter-Bold.woff2 \"https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2\")",
+      "Bash(rm Inter-Medium.woff2 Inter-SemiBold.woff2 Inter-Bold.woff2)",
+      "Bash(mv Inter-Regular.woff2 Inter.woff2)",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(curl -sL -o favicon.svg \"https://realfavicongenerator.net/files/6420ab4e-019d-4157-bac5-1c486ee3d231/favicon.svg\")",
+      "Bash(curl -sL -o favicon-96x96.png \"https://realfavicongenerator.net/files/6420ab4e-019d-4157-bac5-1c486ee3d231/favicon-96x96.png\")",
+      "Bash(curl -sL -o favicon.ico \"https://realfavicongenerator.net/files/6420ab4e-019d-4157-bac5-1c486ee3d231/favicon.ico\")",
+      "Bash(curl -sL -o apple-touch-icon.png \"https://realfavicongenerator.net/files/6420ab4e-019d-4157-bac5-1c486ee3d231/apple-touch-icon.png\")",
+      "Bash(curl -sL -o web-app-manifest-192x192.png \"https://realfavicongenerator.net/files/6420ab4e-019d-4157-bac5-1c486ee3d231/web-app-manifest-192x192.png\")",
+      "Bash(magick --version)",
+      "Bash(powershell.exe:*)",
+      "Bash(bash:*)",
+      "Bash(find:*)"
     ]
   }
 }

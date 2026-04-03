@@ -22,7 +22,8 @@ function createWindow(): void {
     minWidth: 800,
     minHeight: 600,
     title: 'Buffet',
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#0d0d0d',
+    icon: join(__dirname, '../../build/icon.png'),
     webPreferences: {
       preload: join(__dirname, '../preload/index.mjs'),
       sandbox: false
@@ -49,6 +50,12 @@ function createWindow(): void {
   // Start polling with configured interval
   const config = configService.load()
   statusService.startPolling(config.pollingIntervalMs)
+
+  // Auto-remove unit cards when terminal processes exit
+  terminalService.onUnitsChanged = () => {
+    mainWindow?.webContents.send('units:list-update', terminalService.list())
+  }
+  terminalService.startLivenessCheck()
 }
 
 app.whenReady().then(() => {

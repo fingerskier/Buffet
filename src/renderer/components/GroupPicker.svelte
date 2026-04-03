@@ -14,7 +14,7 @@
 </script>
 
 <div class="picker-overlay" onclick={onClose} onkeydown={handleKeydown} role="presentation">
-  <div class="picker" onclick={(e) => e.stopPropagation()} role="listbox" tabindex="-1">
+  <div class="picker" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.stopPropagation()} role="listbox" tabindex="-1">
     {#if groups.length === 0}
       <div class="picker-empty">No groups yet</div>
     {:else}

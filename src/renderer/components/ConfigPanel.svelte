@@ -15,7 +15,7 @@
   appConfig.subscribe(v => config = { ...v })
 
   async function saveConfig() {
-    await api.config.save(config)
+    await api.config.save(JSON.parse(JSON.stringify(config)))
     await refreshConfig()
   }
 
@@ -48,7 +48,7 @@
 
 <div class="overlay" onclick={onClose} role="presentation">
   <div class="panel" bind:this={panelEl} onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.key === 'Escape' && onClose()} role="dialog" tabindex="-1">
-    <h3>⚙ Configuration</h3>
+    <h3>Configuration</h3>
 
     <label class="field">
       <span>Default Shell</span>
@@ -84,7 +84,7 @@
   .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: flex-end;
     z-index: 100;
@@ -93,34 +93,36 @@
   .panel {
     background: var(--bg-secondary);
     border-left: 1px solid var(--border);
-    width: 320px;
+    width: 380px;
     height: 100vh;
-    padding: 20px;
+    padding: var(--space-lg);
     overflow-y: auto;
   }
 
   h3 {
-    margin-bottom: 16px;
+    margin-bottom: var(--space-md);
+    font-size: var(--text-xl);
+    color: var(--text-primary);
   }
 
   h4 {
-    margin-bottom: 8px;
+    margin-bottom: var(--space-sm);
     color: var(--text-secondary);
-    font-size: 12px;
+    font-size: var(--text-sm);
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
 
   .field {
     display: block;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
   }
 
   .field span {
     display: block;
-    font-size: 12px;
+    font-size: var(--text-sm);
     color: var(--text-secondary);
-    margin-bottom: 4px;
+    margin-bottom: 6px;
   }
 
   select {
@@ -128,35 +130,41 @@
     background: var(--bg-primary);
     border: 1px solid var(--border);
     border-radius: 6px;
-    padding: 8px 10px;
+    padding: 10px 12px;
     color: var(--text-primary);
-    font-size: 13px;
+    font-size: var(--text-base);
     outline: none;
   }
 
+  select:focus {
+    border-color: var(--border-focus);
+  }
+
   .section {
-    margin-top: 24px;
-    padding-top: 16px;
+    margin-top: var(--space-lg);
+    padding-top: var(--space-md);
     border-top: 1px solid var(--border);
   }
 
   .data-actions {
     display: flex;
-    gap: 8px;
+    gap: var(--space-sm);
   }
 
   .export-btn, .import-btn {
     flex: 1;
     background: var(--bg-action);
-    border: 1px solid #1a4080;
+    border: 1px solid var(--border);
     border-radius: 6px;
-    padding: 8px;
+    padding: 10px;
     color: var(--info);
-    font-size: 12px;
+    font-size: var(--text-sm);
+    font-weight: 500;
     cursor: pointer;
   }
 
   .export-btn:hover, .import-btn:hover {
-    background: #1a4080;
+    background: var(--bg-elevated);
+    border-color: var(--info);
   }
 </style>

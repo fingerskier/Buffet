@@ -1,7 +1,7 @@
 import { app } from 'electron'
 import { join } from 'path'
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs'
-import type { AppConfig, Favorite, FavoriteGroup, Layout } from '../../shared/types'
+import type { AppConfig, Favorite, FavoriteGroup, Layout, Prompt } from '../../shared/types'
 
 const DATA_DIR = join(app.getPath('userData'), 'buffet-data')
 
@@ -92,6 +92,14 @@ export class ConfigService {
     writeJson('favorite-records.json', favs)
   }
 
+  getPrompts(): Prompt[] {
+    return readJson('prompts.json', [])
+  }
+
+  savePrompts(prompts: Prompt[]): void {
+    writeJson('prompts.json', prompts)
+  }
+
   getLayouts(): Layout[] {
     return readJson('layouts.json', [])
   }
@@ -105,6 +113,7 @@ export class ConfigService {
       config: this.load(),
       favorites: this.getFavorites(),
       favoriteRecords: this.getFavoriteRecords(),
+      prompts: this.getPrompts(),
       layouts: this.getLayouts()
     }, null, 2)
   }
@@ -114,6 +123,7 @@ export class ConfigService {
     if (data.config) this.save(data.config)
     if (data.favorites) this.saveFavorites(data.favorites)
     if (data.favoriteRecords) this.saveFavoriteRecords(data.favoriteRecords)
+    if (data.prompts) this.savePrompts(data.prompts)
     if (data.layouts) this.saveLayouts(data.layouts)
   }
 }

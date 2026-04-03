@@ -22,7 +22,7 @@ const SHELL_COMMANDS: Record<ShellType, string> = {
 }
 
 export class MacOSAdapter implements PlatformAdapter {
-  async spawnTerminal(shell: ShellType, cwd?: string): Promise<number> {
+  async spawnTerminal(shell: ShellType, cwd?: string, name?: string): Promise<number> {
     const shellCmd = SHELL_COMMANDS[shell]
     if (!shellCmd) {
       throw new Error(`Shell "${shell}" is not supported on macOS`)
@@ -30,11 +30,13 @@ export class MacOSAdapter implements PlatformAdapter {
 
     const cdPrefix = cwd ? `cd ${JSON.stringify(cwd)} && ` : ''
     const script = `${cdPrefix}${shellCmd}`
+    const title = name || shell
 
     const { stdout } = await osascript(
       'tell application "Terminal"',
       '  activate',
       `  set newTab to do script "${script.replace(/"/g, '\\"')}"`,
+      `  set custom title of tab 1 of window 1 to "${title.replace(/"/g, '\\"')}"`,
       '  return id of window 1',
       'end tell'
     )
@@ -106,6 +108,14 @@ export class MacOSAdapter implements PlatformAdapter {
       return stdout.trim()
     } catch {
       return ''
+    }
+  }
+
+  async killProcess(pid: number): Promise<void> {
+    try {
+      process.kill(-pid, 'SIGTERM')
+    } catch {
+      try { process.kill(pid, 'SIGKILL') } catch { /* already dead */ }
     }
   }
 

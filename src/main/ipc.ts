@@ -18,6 +18,16 @@ export function registerIpcHandlers(services: Services): void {
   // App
   ipcMain.handle('app:ping', () => ({ ok: true, platform: process.platform }))
 
+  // Dialog
+  ipcMain.handle('dialog:openDirectory', async () => {
+    const win = BrowserWindow.getFocusedWindow()
+    if (!win) return null
+    const { filePaths } = await dialog.showOpenDialog(win, {
+      properties: ['openDirectory']
+    })
+    return filePaths[0] || null
+  })
+
   // Terminal
   ipcMain.handle('terminal:spawn', (_e, shell, name?, cwd?) =>
     terminal.spawn(shell, name, cwd)
@@ -26,6 +36,7 @@ export function registerIpcHandlers(services: Services): void {
   ipcMain.handle('terminal:inject', (_e, pid, text) => terminal.inject(pid, text))
   ipcMain.handle('terminal:kill', (_e, pid) => terminal.kill(pid))
   ipcMain.handle('terminal:focus', (_e, pid) => terminal.focus(pid))
+  ipcMain.handle('terminal:rename', (_e, pid, name) => terminal.rename(pid, name))
   ipcMain.handle('terminal:toggleFavorite', (_e, pid) => terminal.toggleFavorite(pid))
 
   // Status
@@ -54,6 +65,8 @@ export function registerIpcHandlers(services: Services): void {
   ipcMain.handle('config:saveFavorites', (_e, groups) => config.saveFavorites(groups))
   ipcMain.handle('config:getFavoriteRecords', () => config.getFavoriteRecords())
   ipcMain.handle('config:saveFavoriteRecords', (_e, favs) => config.saveFavoriteRecords(favs))
+  ipcMain.handle('config:getPrompts', () => config.getPrompts())
+  ipcMain.handle('config:savePrompts', (_e, prompts) => config.savePrompts(prompts))
 
   ipcMain.handle('config:exportAll', async () => {
     const json = config.exportAll()
