@@ -142,3 +142,5 @@ vite.config.ts.timestamp-*
 .superpowers/
 
 .DS_STORE
+.claude/
+docs/superpowers/
